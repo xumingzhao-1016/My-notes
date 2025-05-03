@@ -47,14 +47,14 @@ CREATE TABLE table_name (
 );
 
 ```
-COMMON CONSTRAINTS
--**NOT NULL**
--**UNIQUE** - all values in a column are different
--**PRIMARY KEY** - A Combination of a NOT NULL & UNIQUE
--**FOREIGN KEY** - Prevents actions that would destroy links between tables
--**CHECK**- Ensures that the values in a column satisfies a specific condition
--**DEFAULT** - sets a default value for a column if no value is specifies
--**CREATE INDEX** - Used to creare and retrive data from the database very quickly
+## COMMON CONSTRAINTS
+- **NOT NULL**
+- **UNIQUE** - all values in a column are different
+- **PRIMARY KEY** - A Combination of a NOT NULL & UNIQUE
+- **FOREIGN KEY** - Prevents actions that would destroy links between tables
+- **CHECK**- Ensures that the values in a column satisfies a specific condition
+- **DEFAULT** - sets a default value for a column if no value is specifies
+- **CREATE INDEX** - Used to creare and retrive data from the database very quickly
 ---
 
 ## ALTER TABLE
