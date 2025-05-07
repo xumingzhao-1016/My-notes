@@ -1,3 +1,22 @@
+# 逻辑流程图
+**FROM        → 连接/抽取原始数据  
+  ↓
+WHERE       → 行筛选（原始字段）  
+  ↓
+GROUP BY    → 分组准备聚合  
+  ↓
+HAVING      → 分组后筛选（支持聚合函数）  
+  ↓
+WINDOW      → 定义窗口别名（可选）  
+  ↓
+SELECT      → 列选择、计算、窗口函数应用  
+  ↓
+DISTINCT    → 去重（如果写了）  
+  ↓
+ORDER BY    → 排序输出结果  
+  ↓
+LIMIT       → 控制返回的行数**
+
 # 📘 Most Important SQL Commands
 
 ## 🗃️ 常用语句说明
@@ -259,6 +278,14 @@ LEFT JOIN Customers
 ON Orders.CustomerID = Customers.Customer ID
 ### 元素相等要指出相对应的表才能链接两个表
 
+CROSS JOIN --两个表格的内容互相匹配
+
+JOIN ON --连接两个表的主键=外键 & 加入附加的筛选条件
+ex.
+ LEFT JOIN UnitsSold u
+   ON p.product_id = u.product_id
+   AND u.purchase_date BETWEEN p.start_date AND p.end_dat
+
 ```
 ---
 
@@ -345,3 +372,48 @@ EXEC Select AllCustomers @City = 'London'
 - **TIMESTAMPDIFF(单位，strat, end)**
 - **TIMEDIFF(hh:mm:ss)**
 - **DATEDIFF(YYYY-MM-DD, YYYY-MM-DD)** - 返回整天数
+
+# 窗口函数
+## common functions
+```sql
+Aggregation function () OVER (
+        PARTITION BY XXX
+        ORDER BY XXX
+)
+```
+- **ROW_NUMBER** - 给每一行分配一个唯一编号，从1开始
+- **RANK()** - 给每一行排名，有并列名次，会跳过数字
+- **DENSE_RANK** - 排名，但不会跳过名次
+- **NTILE(n)** - 把数据平均分成n分（分位数），每行分配到第几组
+- **LAG() & LEAD()** - 访问同组中上一行（LAG）或下一行（LEAD）的值
+- **WINDOW alias** -定义窗口
+  Before:
+  SELECT start_terminal,
+       duration_seconds,
+       NTILE(4) OVER **(PARTITION BY start_terminal ORDER BY duration_seconds)** AS quartile,
+       NTILE(5) OVER (PARTITION BY start_terminal ORDER BY duration_seconds) AS quintile,
+       NTILE(100) OVER (PARTITION BY start_terminal ORDER BY duration_seconds) AS percentile
+FROM tutorial.dc_bikeshare_q1_2012
+WHERE start_time < '2012-01-08'
+ORDER BY start_terminal, duration_seconds;
+
+After:
+SELECT start_terminal,
+       duration_seconds,
+       NTILE(4) OVER ntile_window AS quartile,
+       NTILE(5) OVER ntile_window AS quintile,
+       NTILE(100) OVER ntile_window AS percentile
+FROM tutorial.dc_bikeshare_q1_2012
+WHERE start_time < '2012-01-08'
+**WINDOW ntile_window AS (
+    PARTITION BY start_terminal
+    ORDER BY duration_seconds
+)**
+ORDER BY start_terminal, duration_seconds;
+
+## Advanced functions
+- **ROWS BETWEEN 2 PRECEDING AND CURRENT ROW** - 从当前行往上数2行，再加上当前行本身，总共最多3行，做聚合
+- **ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW** - 当前组从最开始到当前行
+- **RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW** - 当前值及更早的所在值（基于排序值）
+- **FIRST_VALUE()/LAST_VALUE** - 当前窗口的第一个值/最后一个值
+- **NTH_VALUE** - 取窗口中的第n个值
