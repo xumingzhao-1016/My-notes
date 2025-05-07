@@ -278,7 +278,7 @@ UNION ALL - allow duplicate values
 ```
 ---
 
-## Group by
+## Group by - 必须对非GROUP BY的字段做聚合处理
 ```sql
 SELECT 分组字段，聚合函数
 FROM table name
@@ -316,7 +316,7 @@ WHERE Quantity = 10
 ```
 ---
 
-## CASE
+## CASE - 在聚合函数中必须嵌套函数
 ```sql
 CASE
     WHEN condition 1 THEN result 1
@@ -339,3 +339,9 @@ GO
 EXEC Select AllCustomers @City = 'London'
 
 ### @City nvarchar(30) - 定义一个输入参数，名字叫@City， 是长度最多30 的字符串
+```
+---
+## TIMEFIFF VS DATEDIFF
+- **TIMESTAMPDIFF(单位，strat, end)**
+- **TIMEDIFF(hh:mm:ss)**
+- **DATEDIFF(YYYY-MM-DD, YYYY-MM-DD)** - 返回整天数
