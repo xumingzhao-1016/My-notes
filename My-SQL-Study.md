@@ -175,7 +175,21 @@ ORDER BY Country ASC, Customer Name DESC
 - **DESC** - 从大到小
 - **default sorting order** - Ascending
 
+**ORDER BY 是一个优先级排序规则列表，依次判断：
+先比第一个字段（最主要排序标准）；
+如果相同，再比第二个字段；
+如果还相同，再比第三个字段（依此类推）**
+
 ---
+## ROUND
+**ROUND(expression,n)** - expression数学表达式，不能放一整个子查询进去
+```sql
+CORRECT:
+SELECT ROUND(100*(SELECT COUNT(*) FROM Queries WHERE rating<3)/SELECT COUNT(*) FROM Queries, 2) AS poor_query_percentage
+
+FAUX:
+SELECT
+      ROUND(SELECT COUNT(rating)<100/COUNT(rating) FROM Queries WHERE rating<3,2)
 
 ## AND OR
 
@@ -368,11 +382,16 @@ EXEC Select AllCustomers @City = 'London'
 ### @City nvarchar(30) - 定义一个输入参数，名字叫@City， 是长度最多30 的字符串
 ```
 ---
-## TIMEFIFF VS DATEDIFF
+##时间
+TIMEFIFF VS DATEDIFF
 - **TIMESTAMPDIFF(单位，strat, end)**
 - **TIMEDIFF(hh:mm:ss)**
 - **DATEDIFF(YYYY-MM-DD, YYYY-MM-DD)** - 返回整天数
-
+- **DATE_SUB & INTERVAL**
+  WHERE order_date BETWEEN DATE_SUB('2025_05-11', INTERVAL 30 DAY) AND '2025-05-11'
+OR WHERE order_date>=DATE_SUB('2025-05-11', INTERVAL 30 DAY)
+   AND order_date<''2025-05-12
+---
 # 窗口函数
 ## common functions
 ```sql
@@ -381,9 +400,9 @@ Aggregation function () OVER (
         ORDER BY XXX
 )
 ```
-- **ROW_NUMBER** - 给每一行分配一个唯一编号，从1开始
+- **ROW_NUMBER()** - 给每一行分配一个唯一编号，从1开始
 - **RANK()** - 给每一行排名，有并列名次，会跳过数字
-- **DENSE_RANK** - 排名，但不会跳过名次
+- **DENSE_RANK()** - 排名，但不会跳过名次
 - **NTILE(n)** - 把数据平均分成n分（分位数），每行分配到第几组
 - **LAG() & LEAD()** - 访问同组中上一行（LAG）或下一行（LEAD）的值
 - **WINDOW alias** -定义窗口
