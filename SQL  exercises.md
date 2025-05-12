@@ -497,3 +497,127 @@ ON s.player_id = f.player_id
 AND DATEDIFF(s.event_date,f.event_date) = 1
 ```
 ---
+# WHERE VS HAVING
+Table: Customer
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| customer_id | int     |
+| product_key | int     |
++-------------+---------+
+This table may contain duplicates rows. 
+customer_id is not NULL.
+product_key is a foreign key (reference column) to Product table.
+ 
+
+Table: Product
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_key | int     |
++-------------+---------+
+product_key is the primary key (column with unique values) for this table.
+ 
+
+Write a solution to report the customer ids from the Customer table that bought all the products in the Product table.
+
+Return the result table in any order.
+```sql
+SELECT customer_id
+FROM Customer
+GROUP BY customer_id
+HAVING COUNT(DISTINCT(product_key)) = (SELECT COUNT(*) FROM Product)
+### where筛选原始数据，having筛选聚合后的数据
+```
+---
+
+# Consecutive Number
+## 自连接
+**连续相同值判断，适用于明确id的顺序**
+Table: Logs
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| num         | varchar |
++-------------+---------+
+In SQL, id is the primary key for this table.
+id is an autoincrement column starting from 1.
+ 
+
+Find all numbers that appear at least three times consecutively.
+
+Return the result table in any order.
+
+```sql
+SELECT l1.num AS ConsecutiveNums
+FROM logs l1
+JOIN logs l2 ON l2.id = l1.id-1
+JOIN logs l3 ON l3.id = l2.id-1
+WHERE l1.num = l2.num AND l2.num = l3.num
+```
+---
+## 窗口函数
+**判断当前行与前后行是否相同或差值为1（连续增长）**
+表 Scores：
+
+id	score
+1	80
+2	81
+3	82
+4	75
+5	76
+6	77
+7	90
+
+问题：找出所有连续“递增3次”的起始 score 值。
+```sql
+SELECT sub.start_score
+FROM (SELECT score,
+              LEAD(score) OVER (ORDER BY id) AS final_score,
+              LAG(score) OVER (ORDER BY id) AS start_score
+       FROM Scores
+       ) AS sub
+WHERE sub.score - 1 = sub.start_score AND sub.score + 1 = sub.final_score
+```
+---
+
+## 变量法+差值组编号
+**用来处理更长的连续段——连续子序列**
+表 Events：
+
+id	status
+1	online
+2	online
+3	offline
+4	offline
+5	offline
+6	online
+7	online
+8	online
+
+📝 表示用户在不同时间点的状态。
+
+🎯 问题：
+找出每一段 连续相同状态 的段落，输出结果如下：
+
+status	start_id	end_id
+online	1	2
+offline	3	5
+online	6	8
+
+```sql
+SELECT status, MIN(id) AS start_id, MAX(id) AS end_id
+FROM (SELECT id, status,
+             ROW_NUMBER() OVER(PARTITION BY status ORDER BY id) AS row_num,
+             id - ROW_NUMBER() OVER (PARTITION BY status ORDER BY id) AS group_id --减差法 —— 在连续块中是固定的，一旦换状态就会变
+      FROM Events
+      ) AS a
+GROUP BY status, group_id
+ORDER BY start_id
+```
+**减差法** - 对于一个连续的相同值序列，它的id和row_number的差值是固定的，可以用这个差值来标记“当前这段连续块”
+---
