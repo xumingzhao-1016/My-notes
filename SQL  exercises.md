@@ -621,3 +621,56 @@ ORDER BY start_id
 ```
 **减差法** - 对于一个连续的相同值序列，它的id和row_number的差值是固定的，可以用这个差值来标记“当前这段连续块”
 ---
+# 拆表情况总结
+当一张表中的数据既包含“要呈现的结果”， 又包含“提取所需的信息”， 就需要拆表
+## 1. 每组取一条：每组中取“最近”、“最大”、“最小”记录
+## 2. 保留全量主键：需要保留所有主键不遗漏 - LEFT JOIN + COALESCE
+Table: Products
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| product_id    | int     |
+| new_price     | int     |
+| change_date   | date    |
++---------------+---------+
+(product_id, change_date) is the primary key (combination of columns with unique values) of this table.
+Each row of this table indicates that the price of some product was changed to a new price at some date.
+ 
+
+Write a solution to find the prices of all products on 2019-08-16. Assume the price of all products before any change is 10.
+
+Return the result table in any order.
+```sql
+SELECT all_products.product_id, COALESCE(latest_price.new_price,10) AS price
+FROM (SELECT DISTINCT product_id FROM Products) AS all_products ### 2. 保留全量主键
+LEFT JOIN(SELECT product_id, new_price
+          FROM (SELECT*,
+                      ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY change_date DESC) AS rn
+               FROM Products
+               WHERE change_date <= '2019-08-16'
+          ) AS ranked
+          WHERE rn=1
+) AS latest_price ### 1. 每组取一条
+ON all_products.product_id = latest_price.product_id
+
+OR
+
+LEFT JOIN (
+     SELECT product_id, new_price
+     FROM Products
+     WHERE (product_id, new_price) IN (
+            SELECT product_id, MAX(change_date)
+            FROM Products
+            WHERE change_date <= '2019-08-16'
+            GROUP BY product_id)
+           ) AS grouped
+ON all_products.product_id = grouped.product_id
+```
+---
+
+
+## 3. 多条件JOIN：查出最符合条件的记录行（如（a,b)）是唯一标识
+## 4. 分组排序取前几名
+## 5. 拆出中间汇总：需要先分组统计某值再筛选或比较
+## 6. 多逻辑拼接：不同的筛选逻辑来源于同一张表
