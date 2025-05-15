@@ -156,13 +156,22 @@ WHERE condition
 SELECT * FROM Customers
 WHERE Country='Mexico'
 ```
-### WHERE = Condition
+## OPERATORS
 - **=** - Equal
 - **>** - Greater than
 - **<** - Less than
 - **>=** - greater than or equal
 - **<=** - less than or equal
 - **<> or !=** - not equal
+- 
+**MOD()**
+- MOD(X,2)=0 判断偶数
+- MOD(X,2)=1 判断奇数
+- MOD(row_number,N) 每N行为一组
+- CASE WHEN MOD(id,2) = 0 隔行标记
+
+
+  
 - **BETWEEN** - Between a certain range
 - **LIKE** - Search for a pattern （模糊匹配）
 
@@ -368,6 +377,7 @@ WHERE Quantity = 10
 ---
 
 ## CASE - 在聚合函数中必须嵌套函数
+### 筛选条件
 ```sql
 CASE
     WHEN condition 1 THEN result 1
@@ -376,6 +386,34 @@ CASE
     ELSE result
 END (AS Groupname);
 ### if no condition is true in a CASE expression and there is no ELSE clause
+```
+### 增加查询新列,仅限此次查询，不会改变表格结构
+Table: Triangle
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| x           | int  |
+| y           | int  |
+| z           | int  |
++-------------+------+
+In SQL, (x, y, z) is the primary key column for this table.
+Each row of this table contains the lengths of three line segments.
+ 
+
+Report for every three line segments whether they can form a triangle.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
+```sql
+SELECT x,y,z,
+      CASE
+          WHEN x+y>z and x+z>y and y+z>x THEN 'Yes'
+          ELSE 'No'
+          END AS triangle
+FROM Triangle
 ```
 ---
 
@@ -392,7 +430,7 @@ EXEC Select AllCustomers @City = 'London'
 ### @City nvarchar(30) - 定义一个输入参数，名字叫@City， 是长度最多30 的字符串
 ```
 ---
-##时间
+## 时间
 TIMEFIFF VS DATEDIFF
 - **TIMESTAMPDIFF(单位，strat, end)**
 - **TIMEDIFF(hh:mm:ss)**
@@ -401,6 +439,8 @@ TIMEFIFF VS DATEDIFF
   WHERE order_date BETWEEN DATE_SUB('2025_05-11', INTERVAL 30 DAY) AND '2025-05-11'
 OR WHERE order_date>=DATE_SUB('2025-05-11', INTERVAL 30 DAY)
    AND order_date<''2025-05-12
+- **MONTH('date')** - 指明月份
+- **YEAR ('date'）** - 指明年份
 ---
 # 窗口函数
 ## common functions
