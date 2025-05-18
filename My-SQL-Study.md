@@ -439,8 +439,10 @@ TIMEFIFF VS DATEDIFF
   WHERE order_date BETWEEN DATE_SUB('2025_05-11', INTERVAL 30 DAY) AND '2025-05-11'
 OR WHERE order_date>=DATE_SUB('2025-05-11', INTERVAL 30 DAY)
    AND order_date<''2025-05-12
-- **MONTH('date')** - 指明月份
-- **YEAR ('date'）** - 指明年份
+- **MONTH('date')=** - 指明月份
+- **YEAR ('date'）=** - 指明年份
+- **DATE_ADD(date, INTERVAL n DAY)** - 给指定日期加上n天
+- **DATE_SUB('DATE', INTERVAL n DAY)** -给指定日期减去n天
 ---
 # 窗口函数
 ## common functions
@@ -480,9 +482,23 @@ WHERE start_time < '2012-01-08'
 )**
 ORDER BY start_terminal, duration_seconds;
 
-## Advanced functions
+## Advanced functions 写在over()里
 - **ROWS BETWEEN 2 PRECEDING AND CURRENT ROW** - 从当前行往上数2行，再加上当前行本身，总共最多3行，做聚合
 - **ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW** - 当前组从最开始到当前行
 - **RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW** - 当前值及更早的所在值（基于排序值）
+- **RANGE BETWEEN INTERVAL 6 DAY AND CURRENT ROW** - 要是前面ORDER BY 后面跟的是时间形式DATETIME，必须用interval
 - **FIRST_VALUE()/LAST_VALUE** - 当前窗口的第一个值/最后一个值
 - **NTH_VALUE** - 取窗口中的第n个值
+
+SELECT 
+  visited_on,
+  SUM(amount) OVER customer_window AS amount,
+  ROUND(AVG(amount) OVER customer_window,2) AS average_amount
+FROM Customer
+WHERE visited_on >= DATE_ADD(
+    (SELECT MIN(visited_on) FROM Customer), 
+    INTERVAL 6 DAY)
+WINDOW customer_window AS (
+    ORDER BY visited_on
+    RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW)
+ORDER BY visited_on ASC
