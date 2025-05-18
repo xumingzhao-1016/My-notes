@@ -667,6 +667,47 @@ LEFT JOIN (
            ) AS grouped
 ON all_products.product_id = grouped.product_id
 ```
+### 全量主键一张表+其他数据left join
+Table: Accounts
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| account_id  | int  |
+| income      | int  |
++-------------+------+
+account_id is the primary key (column with unique values) for this table.
+Each row contains information about the monthly income for one bank account.
+ 
+
+Write a solution to calculate the number of bank accounts for each salary category. The salary categories are:
+
+"Low Salary": All the salaries strictly less than $20000.
+"Average Salary": All the salaries in the inclusive range [$20000, $50000].
+"High Salary": All the salaries strictly greater than $50000.
+The result table must contain all three categories. If there are no accounts in a category, return 0.
+
+Return the result table in any order.
+```sql
+SELECT c.category, COUNT(a.account_id) AS accounts_count
+FROM ( SELECT 'Low Salary' AS category
+       UNION ALL
+       SELECT 'Average Salary'
+       UNION ALL
+       SELECT 'High Salary'
+) AS c ### 把详细总分类单拎出来成一个新的表格
+LEFT JOIN ( SELECT account_id,
+            CASE
+              WHEN income < 20000 THEN 'Low Salary'
+               WHEN income >= 20000 AND income <=50000 THEN 'Average Salary'
+               ELSE 'High Salary'
+               END AS category
+           FROM Accounts) AS a ### join详细分类信息
+ON c.category = a.category
+GROUP BY c.category
+```
+
+
 ---
 
 
@@ -674,3 +715,111 @@ ON all_products.product_id = grouped.product_id
 ## 4. 分组排序取前几名
 ## 5. 拆出中间汇总：需要先分组统计某值再筛选或比较
 ## 6. 多逻辑拼接：不同的筛选逻辑来源于同一张表
+
+# UNION ALL - 纵向合并多个select查询结果（不会去重）- UNION会去重
+## 生成分类组成的小表 - 造出完整集合
+Table: Accounts
+
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| account_id  | int  |
+| income      | int  |
++-------------+------+
+account_id is the primary key (column with unique values) for this table.
+Each row contains information about the monthly income for one bank account.
+ 
+
+Write a solution to calculate the number of bank accounts for each salary category. The salary categories are:
+
+"Low Salary": All the salaries strictly less than $20000.
+"Average Salary": All the salaries in the inclusive range [$20000, $50000].
+"High Salary": All the salaries strictly greater than $50000.
+The result table must contain all three categories. If there are no accounts in a category, return 0.
+
+Return the result table in any order.
+```sql
+SELECT c.category, COUNT(a.account_id) AS accounts_count
+FROM ( SELECT 'Low Salary' AS category
+       UNION ALL
+       SELECT 'Average Salary'
+       UNION ALL
+       SELECT 'High Salary'
+) AS c ### 把详细总分类单拎出来成一个新的表格
+LEFT JOIN ( SELECT account_id,
+            CASE
+              WHEN income < 20000 THEN 'Low Salary'
+               WHEN income >= 20000 AND income <=50000 THEN 'Average Salary'
+               ELSE 'High Salary'
+               END AS category
+           FROM Accounts) AS a ### join详细分类信息
+ON c.category = a.category
+GROUP BY c.category
+```
+## 合并两条结果 - 将两个字段统一为一列纵向排列
+Table: Movies
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| movie_id      | int     |
+| title         | varchar |
++---------------+---------+
+movie_id is the primary key (column with unique values) for this table.
+title is the name of the movie.
+ 
+
+Table: Users
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| name          | varchar |
++---------------+---------+
+user_id is the primary key (column with unique values) for this table.
+The column 'name' has unique values.
+Table: MovieRating
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| movie_id      | int     |
+| user_id       | int     |
+| rating        | int     |
+| created_at    | date    |
++---------------+---------+
+(movie_id, user_id) is the primary key (column with unique values) for this table.
+This table contains the rating of a movie by a user in their review.
+created_at is the user's review date. 
+ 
+
+Write a solution to:
+
+Find the name of the user who has rated the greatest number of movies. In case of a tie, return the lexicographically smaller user name.
+Find the movie name with the highest average rating in February 2020. In case of a tie, return the lexicographically smaller movie name.
+```sql
+SELECT u.name
+FROM ( SELECT u.name
+       FROM MovieRating mr
+       JOIN Users u
+       ON mr.user_id = u.user_id
+       GROUP BY u.user_id
+       ORDER BY COUNT(*) DESC, u.name ASC
+       LIMIT 1
+) AS u
+
+UNION ALL
+
+SELECT m.title
+FROM ( SELECT m.title
+       FROM MovieRating mr
+       JOIN Movies m
+       ON mr.movie_id = m.movie_id
+       GROUP BY m.title
+       ORDER BY AVG(rating) DESC, m.title ASC
+       LIMIT 1
+) AS m
+
+```
+---
