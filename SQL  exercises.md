@@ -823,3 +823,24 @@ FROM ( SELECT m.title
 
 ```
 ---
+# 时间维度滑动窗口+按维度拆主表+自连接+条件聚合
+```sql
+SELECT
+  anchor.anchor_key,                -- 主表的锚点（如 visited_on）
+  AGGREGATE(b.some_value) AS total, -- 你要计算的聚合值，如 SUM、AVG 等
+  ROUND(AGGREGATE(...) / N, 2) AS avg_value
+FROM
+  (SELECT DISTINCT anchor_key FROM table) AS anchor  -- 拆主表：提取所有锚点
+JOIN
+  table AS b
+ON
+  b.match_key BETWEEN anchor.anchor_key - INTERVAL X DAY AND anchor.anchor_key
+GROUP BY
+  anchor.anchor_key
+HAVING
+  COUNT(DISTINCT b.match_key) = Y   -- 用于控制完整窗口（可选）
+ORDER BY
+  anchor.anchor_key;
+
+```
+---
