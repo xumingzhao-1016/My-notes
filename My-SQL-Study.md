@@ -430,7 +430,7 @@ EXEC Select AllCustomers @City = 'London'
 ### @City nvarchar(30) - 定义一个输入参数，名字叫@City， 是长度最多30 的字符串
 ```
 ---
-## 时间
+# 时间
 TIMEFIFF VS DATEDIFF
 - **TIMESTAMPDIFF(单位，strat, end)**
 - **TIMEDIFF(hh:mm:ss)**
@@ -443,6 +443,25 @@ OR WHERE order_date>=DATE_SUB('2025-05-11', INTERVAL 30 DAY)
 - **YEAR ('date'）=** - 指明年份
 - **DATE_ADD(date, INTERVAL n DAY)** - 给指定日期加上n天
 - **DATE_SUB('DATE', INTERVAL n DAY)** -给指定日期减去n天
+
+## DATE_FORMAT(date,format_string)
+| 格式符  | 含义         | 示例       |
+| ---- | ---------- | -------- |
+| `%Y` | 年（四位）      | `2025`   |
+| `%y` | 年（两位）      | `25`     |
+| `%m` | 月（两位数字）    | `05`     |
+| `%c` | 月（不补零）     | `5`      |
+| `%M` | 月（英文全称）    | `May`    |
+| `%b` | 月（英文简写）    | `May`    |
+| `%d` | 日（两位数字）    | `19`     |
+| `%e` | 日（不补零）     | `19`     |
+| `%W` | 星期（英文全称）   | `Monday` |
+| `%w` | 星期（数字0=周日） | `1`（周一）  |
+| `%H` | 小时（24小时制）  | `14`     |
+| `%h` | 小时（12小时制）  | `02`     |
+| `%i` | 分钟         | `30`     |
+| `%s` | 秒          | `45`     |
+
 ---
 # 窗口函数
 ## common functions
