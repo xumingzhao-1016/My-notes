@@ -61,3 +61,4 @@ is_student = True
 | `math.prod(iterable)` | 所有元素连乘      | `math.prod([2,3,4])` → 24 | Python 3.8+ |
 
 
+# zip() - 将每个输入对象中相同位置的元素组合在一起 - 会自动以最短的列表为准，超出部分会被忽略
