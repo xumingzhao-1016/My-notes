@@ -435,7 +435,7 @@ TIMEFIFF VS DATEDIFF
 - **TIMESTAMPDIFF(单位，strat, end)**
 - **TIMEDIFF(hh:mm:ss)**
 - **DATEDIFF(YYYY-MM-DD, YYYY-MM-DD)** - 返回整天数
-- **DATE_SUB & INTERVAL**
+- **DATE_SUB & INTERVAL**日期减去过去的一段时间（天月日）
   WHERE order_date BETWEEN DATE_SUB('2025_05-11', INTERVAL 30 DAY) AND '2025-05-11'
 OR WHERE order_date>=DATE_SUB('2025-05-11', INTERVAL 30 DAY)
    AND order_date<''2025-05-12
