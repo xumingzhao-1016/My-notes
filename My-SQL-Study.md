@@ -37,8 +37,8 @@ LIMIT       → 控制返回的行数**
 
 # COALESCE: 返回参数中第一个非null的值
 ```sql
-COALESCE(value1, value2, value3...valuen)
-### 返回从左到右第一个不是NULL的值。如果所有值都是null，就返回NULL
+COALESCE(value1, value2, value3...,default_val)
+### 返回从左到右第一个不是NULL的值。如果所有值都是null，就返回最后的default_val
 ex.
 SELECT COALESCE(NULL,NULL,'HELLO')
 -- 'HELLO'
