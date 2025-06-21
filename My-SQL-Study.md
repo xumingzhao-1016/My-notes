@@ -44,6 +44,19 @@ SELECT COALESCE(NULL,NULL,'HELLO')
 -- 'HELLO'
 ```
 ---
+# CAST()强制转换数据类型
+```sql
+CAST(expression AS target_type)
+```
+| 类型                         | 用途         |
+| -------------------------- | ---------- |
+| `SIGNED`                   | 整数         |
+| `UNSIGNED`                 | 非负整数       |
+| `CHAR`                     | 字符串        |
+| `DECIMAL(p,s)`             | 定点小数（精度控制） |
+| `DATE`, `DATETIME`, `TIME` | 时间类型       |
+
+---
 
 ## SQL Comments
 - **--** - single line comments
