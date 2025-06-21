@@ -200,7 +200,7 @@ ORDER BY Country ASC, Customer Name DESC
 如果还相同，再比第三个字段（依此类推）**
 
 ---
-## ROUND
+## ROUND 四舍五入
 **ROUND(expression,n)** - expression数学表达式，不能放一整个子查询进去
 ```sql
 CORRECT:
@@ -209,6 +209,8 @@ SELECT ROUND(100*(SELECT COUNT(*) FROM Queries WHERE rating<3)/SELECT COUNT(*) F
 FAUX:
 SELECT
       ROUND(SELECT COUNT(rating)<100/COUNT(rating) FROM Queries WHERE rating<3,2)
+```
+## FLOOR()向下取整（不四舍五入）
 
 ## AND OR
 
